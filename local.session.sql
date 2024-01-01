@@ -1,3 +1,16 @@
 -- >> Resol les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
 
--- 1. Retorna un llistat amb els noms de tots els professors/es i els departaments que tenen vinculats. El llistat també ha de mostrar aquells professors/es que no tenen cap departament associat. El llistat ha de retornar quatre columnes, nom del departament, primer cognom, segon cognom i nom del professor/a. El resultat estarà ordenat alfabèticament de menor a major pel nom del departament, cognoms i el nom.
+-- 6. Retorna un llistat amb tots els departaments que no han impartit assignatures en cap curs escolar.
+
+
+
+-- >> Consultes resum:
+
+-- 3. Calcula quants professors/es hi ha en cada departament. El resultat només ha de mostrar dues columnes, una amb el nom del departament i una altra amb el nombre de professors/es que hi ha en aquest departament. El resultat només ha d'incloure els departaments que tenen professors/es associats i haurà d'estar ordenat de major a menor pel nombre de professors/es.
+
+SELECT departamento.nombre AS nombre_departamento, COUNT(profesor.id_profesor) AS numero_profesores
+FROM universidad.departamento
+JOIN universidad.profesor ON departamento.id = profesor.id_departamento
+GROUP BY departamento.nombre
+HAVING COUNT(profesor.id_profesor) > 0
+ORDER BY COUNT(profesor.id_profesor) DESC;

@@ -37,14 +37,21 @@ SELECT DISTINCT persona.* FROM universidad.persona INNER JOIN universidad.alumno
 -- >> Resol les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
 
 -- 1. Retorna un llistat amb els noms de tots els professors/es i els departaments que tenen vinculats. El llistat també ha de mostrar aquells professors/es que no tenen cap departament associat. El llistat ha de retornar quatre columnes, nom del departament, primer cognom, segon cognom i nom del professor/a. El resultat estarà ordenat alfabèticament de menor a major pel nom del departament, cognoms i el nom.
+SELECT departamento.nombre AS departamento, persona.apellido1, persona.apellido2, persona.nombre AS nombre FROM universidad.profesor LEFT JOIN universidad.departamento ON profesor.id_departamento = departamento.id RIGHT JOIN universidad.persona ON persona.id = profesor.id_profesor ORDER BY departamento.nombre ASC, persona.apellido1 ASC, persona.apellido2 ASC, persona.nombre ASC;
 
 -- 2. Retorna un llistat amb els professors/es que no estan associats a un departament.
+SELECT persona.nombre, persona.apellido1, persona.apellido2 FROM universidad.profesor LEFT JOIN universidad.departamento ON profesor.id_departamento = departamento.id RIGHT JOIN universidad.persona ON persona.id = profesor.id_profesor WHERE departamento.nombre IS NULL;
 
 -- 3. Retorna un llistat amb els departaments que no tenen professors/es associats.
+SELECT DISTINCT departamento.nombre FROM universidad.departamento 
+LEFT JOIN universidad.profesor ON profesor.id_departamento = departamento.id
+WHERE profesor.id_departamento IS NULL;
 
 -- 4. Retorna un llistat amb els professors/es que no imparteixen cap assignatura.
+SELECT persona.nombre AS nombre_profesor, persona.apellido1, persona.apellido2, asignatura.nombre AS asignatura FROM universidad.profesor RIGHT JOIN universidad.persona ON profesor.id_profesor = persona.id LEFT JOIN universidad.asignatura ON profesor.id_profesor = asignatura.id_profesor WHERE asignatura.id_profesor IS NULL;
 
 -- 5. Retorna un llistat amb les assignatures que no tenen un professor/a assignat.
+SELECT nombre FROM universidad.asignatura WHERE id_profesor IS NULL;
 
 -- 6. Retorna un llistat amb tots els departaments que no han impartit assignatures en cap curs escolar.
 
@@ -52,10 +59,18 @@ SELECT DISTINCT persona.* FROM universidad.persona INNER JOIN universidad.alumno
 -- >> Consultes resum:
 
 -- 1. Retorna el nombre total d'alumnes que hi ha.
+SELECT COUNT(*) FROM universidad.persona WHERE tipo = 'alumno';
 
 -- 2. Calcula quants alumnes van néixer en 1999.
+SELECT COUNT(*) FROM universidad.persona WHERE tipo = 'alumno' AND YEAR(fecha_nacimiento) = 1999;
 
 -- 3. Calcula quants professors/es hi ha en cada departament. El resultat només ha de mostrar dues columnes, una amb el nom del departament i una altra amb el nombre de professors/es que hi ha en aquest departament. El resultat només ha d'incloure els departaments que tenen professors/es associats i haurà d'estar ordenat de major a menor pel nombre de professors/es.
+SELECT departamento.nombre AS nombre_departamento, COUNT(profesor.id_profesor) AS numero_profesores
+FROM universidad.departamento
+JOIN universidad.profesor ON departamento.id = profesor.id_departamento
+GROUP BY departamento.nombre
+HAVING COUNT(profesor.id_profesor) > 0
+ORDER BY COUNT(profesor.id_profesor) DESC;
 
 -- 4. Retorna un llistat amb tots els departaments i el nombre de professors/es que hi ha en cadascun d'ells. Tingui en compte que poden existir departaments que no tenen professors/es associats. Aquests departaments també han d'aparèixer en el llistat.
 
