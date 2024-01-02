@@ -54,6 +54,12 @@ SELECT persona.nombre AS nombre_profesor, persona.apellido1, persona.apellido2, 
 SELECT nombre FROM universidad.asignatura WHERE id_profesor IS NULL;
 
 -- 6. Retorna un llistat amb tots els departaments que no han impartit assignatures en cap curs escolar.
+SELECT departamento.nombre AS departamento FROM universidad.departamento LEFT JOIN universidad.profesor ON departamento.id = profesor.id_departamento LEFT JOIN universidad.asignatura ON profesor.id_profesor = asignatura.id_profesor GROUP BY departamento.nombre HAVING MAX(asignatura.id) IS NULL;
+
+    --MAX(asignatura.id) devuelve el valor más grande de asignatura.id para cada grupo. Si un departamento no ha impartido ninguna asignatura, entonces todos los valores de asignatura.id para ese departamento serán NULL, y el valor máximo también será NULL.
+    -- Por lo tanto, HAVING MAX(asignatura.id) IS NULL incluirá solo los departamentos que no han impartido ninguna asignatura, ya que para ellos, el valor máximo de asignatura.id será NULL.
+
+Por lo tanto, HAVING MAX(asignatura.id) IS NULL incluirá solo los departamentos que no han impartido ninguna asignatura, ya que para ellos, el valor máximo de asignatura.id será NULL.
 
 
 -- >> Consultes resum:
@@ -65,20 +71,29 @@ SELECT COUNT(*) FROM universidad.persona WHERE tipo = 'alumno';
 SELECT COUNT(*) FROM universidad.persona WHERE tipo = 'alumno' AND YEAR(fecha_nacimiento) = 1999;
 
 -- 3. Calcula quants professors/es hi ha en cada departament. El resultat només ha de mostrar dues columnes, una amb el nom del departament i una altra amb el nombre de professors/es que hi ha en aquest departament. El resultat només ha d'incloure els departaments que tenen professors/es associats i haurà d'estar ordenat de major a menor pel nombre de professors/es.
-SELECT departamento.nombre AS nombre_departamento, COUNT(profesor.id_profesor) AS numero_profesores
-FROM universidad.departamento
-JOIN universidad.profesor ON departamento.id = profesor.id_departamento
-GROUP BY departamento.nombre
-HAVING COUNT(profesor.id_profesor) > 0
-ORDER BY COUNT(profesor.id_profesor) DESC;
+SELECT departamento.nombre AS departamento, COUNT(profesor.id_profesor) AS numero_profesores FROM universidad.departamento JOIN universidad.profesor ON departamento.id = profesor.id_departamento GROUP BY departamento.nombre HAVING COUNT(profesor.id_profesor) > 0 ORDER BY COUNT(profesor.id_profesor) DESC;
 
 -- 4. Retorna un llistat amb tots els departaments i el nombre de professors/es que hi ha en cadascun d'ells. Tingui en compte que poden existir departaments que no tenen professors/es associats. Aquests departaments també han d'aparèixer en el llistat.
+SELECT departamento.nombre AS departamento, GROUP_CONCAT(CONCAT(persona.nombre, ' ', persona.apellido1, ' ', persona.apellido2)) AS profesores FROM universidad.departamento LEFT JOIN universidad.profesor ON departamento.id = profesor.id_departamento LEFT JOIN universidad.persona ON profesor.id_profesor = persona.id AND persona.tipo = 'profesor' GROUP BY departamento.nombre;
 
 -- 5. Retorna un llistat amb el nom de tots els graus existents en la base de dades i el nombre d'assignatures que té cadascun. Tingues en compte que poden existir graus que no tenen assignatures associades. Aquests graus també han d'aparèixer en el llistat. El resultat haurà d'estar ordenat de major a menor pel nombre d'assignatures.
+SELECT grado.nombre AS grado, GROUP_CONCAT(asignatura.nombre ORDER BY asignatura.nombre DESC) AS asignaturas FROM universidad.grado LEFT JOIN universidad.asignatura ON grado.id = asignatura.id_grado GROUP BY grado.nombre;
 
 -- 6. Retorna un llistat amb el nom de tots els graus existents en la base de dades i el nombre d'assignatures que té cadascun, dels graus que tinguin més de 40 assignatures associades.
+SELECT grado.nombre AS grado, COUNT(asignatura.nombre) AS numero_de_asignaturas
+FROM universidad.grado LEFT JOIN universidad.asignatura ON grado.id = asignatura.id_grado GROUP BY grado.nombre ORDER BY numero_de_asignaturas DESC;
+
+    -- >> NO ENTIENDO MUY BIEN LA 2ª PARTE DE LA PREGUNTA SOBRE LAS 40 ASIGNATURAS, abajo la version que creo correcta pero entonces no listo todos los GRADOS:
+SELECT grado.nombre AS grado, COUNT(asignatura.nombre) AS numero_de_asignaturas
+FROM universidad.grado 
+LEFT JOIN universidad.asignatura ON grado.id = asignatura.id_grado
+GROUP BY grado.nombre
+HAVING numero_de_asignaturas > 40;
 
 -- 7. Retorna un llistat que mostri el nom dels graus i la suma del nombre total de crèdits que hi ha per a cada tipus d'assignatura. El resultat ha de tenir tres columnes: nom del grau, tipus d'assignatura i la suma dels crèdits de totes les assignatures que hi ha d'aquest tipus.
+SELECT grado.nombre AS nombre_grado, asignatura.tipo AS tipo_asignatura, SUM(asignatura.creditos) AS suma_de_creditos FROM universidad.grado LEFT JOIN universidad.asignatura ON grado.id = asignatura.id_grado GROUP BY grado.nombre, asignatura.tipo;
+
+    -- La cláusula GROUP BY agrupa los resultados por las columnas grado.nombre y asignatura.tipo. Significa que para cada combinación única de nombre de grado y tipo de asignatura, se sumarán los créditos de las asignaturas correspondientes.
 
 -- 8. Retorna un llistat que mostri quants alumnes s'han matriculat d'alguna assignatura en cadascun dels cursos escolars. El resultat haurà de mostrar dues columnes, una columna amb l'any d'inici del curs escolar i una altra amb el nombre d'alumnes matriculats.
 
