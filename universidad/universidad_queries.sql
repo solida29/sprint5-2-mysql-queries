@@ -96,9 +96,13 @@ SELECT grado.nombre AS nombre_grado, asignatura.tipo AS tipo_asignatura, SUM(asi
     -- La cláusula GROUP BY agrupa los resultados por las columnas grado.nombre y asignatura.tipo. Significa que para cada combinación única de nombre de grado y tipo de asignatura, se sumarán los créditos de las asignaturas correspondientes.
 
 -- 8. Retorna un llistat que mostri quants alumnes s'han matriculat d'alguna assignatura en cadascun dels cursos escolars. El resultat haurà de mostrar dues columnes, una columna amb l'any d'inici del curs escolar i una altra amb el nombre d'alumnes matriculats.
+SELECT curso_escolar.anyo_inicio, COUNT(alumno_se_matricula_asignatura.id_alumno) AS numero_alumnos_matriculados FROM universidad.curso_escolar LEFT JOIN universidad.alumno_se_matricula_asignatura ON curso_escolar.id = alumno_se_matricula_asignatura.id_curso_escolar GROUP BY curso_escolar.anyo_inicio;
 
 -- 9. Retorna un llistat amb el nombre d'assignatures que imparteix cada professor/a. El llistat ha de tenir en compte aquells professors/es que no imparteixen cap assignatura. El resultat mostrarà cinc columnes: id, nom, primer cognom, segon cognom i nombre d'assignatures. El resultat estarà ordenat de major a menor pel nombre d'assignatures.
+SELECT profesor.id_profesor AS id, persona.nombre AS nombre, persona.apellido1, persona.apellido2, COUNT(asignatura.nombre) AS numero_de_asignaturas FROM universidad.profesor LEFT JOIN universidad.persona ON profesor.id_profesor = persona.id LEFT JOIN universidad.asignatura ON profesor.id_profesor = asignatura.id_profesor GROUP BY profesor.id_profesor ORDER BY numero_de_asignaturas DESC;
 
 -- 10. Retorna totes les dades de l'alumne/a més jove.
+SELECT * FROM universidad.persona WHERE persona.tipo = 'alumno' ORDER BY fecha_nacimiento ASC LIMIT 1;
 
 -- 11. Retorna un llistat amb els professors/es que tenen un departament associat i que no imparteixen cap assignatura.
+SELECT profesor.id_profesor, persona.nombre, persona.apellido1, persona.apellido2 FROM universidad.profesor JOIN universidad.persona ON profesor.id_profesor = persona.id LEFT JOIN universidad.asignatura ON profesor.id_profesor = asignatura.id_profesor WHERE asignatura.id_profesor IS NULL;

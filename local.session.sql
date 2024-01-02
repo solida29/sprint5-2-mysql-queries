@@ -1,1 +1,6 @@
--- 8. Retorna un llistat que mostri quants alumnes s'han matriculat d'alguna assignatura en cadascun dels cursos escolars. El resultat haurà de mostrar dues columnes, una columna amb l'any d'inici del curs escolar i una altra amb el nombre d'alumnes matriculats.
+-- 11. Retorna un llistat amb els professors/es que tenen un departament associat i que no imparteixen cap assignatura.
+SELECT profesor.id_profesor, persona.nombre, persona.apellido1, persona.apellido2
+FROM universidad.profesor
+JOIN universidad.persona ON profesor.id_profesor = persona.id
+LEFT JOIN universidad.asignatura ON profesor.id_profesor = asignatura.id_profesor
+WHERE asignatura.id_profesor IS NULL;
